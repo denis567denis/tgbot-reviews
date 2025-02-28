@@ -30,11 +30,17 @@ function isForwardedMessage(message: any): message is { forward_date: number } {
 
 function getMessageText(message: any): string | undefined {
   if ('text' in message) {
-    return message.text;
+    return message.text; // Текстовое сообщение
   } else if ('caption' in message) {
-    return message.caption;
+    return message.caption; // Медиа с подписью
   }
-  return undefined;
+  return undefined; // Сообщение не содержит текста или подписи
+}
+
+// Функция для извлечения @username из ссылки
+function extractUsernameFromLink(text: string): string | null {
+  const match = text.match(/https:\/\/t\.me\/\w+_bot\/(@\w+)/);
+  return match ? match[1] : null; // Возвращаем @username или null
 }
 
 async function sendComments(ctx: any, comments: any[]) {
@@ -121,12 +127,20 @@ async function handleCommentsRequest(ctx: any, userId: number, salesmanName: str
   }
 })();
 
-bot.command('start', (ctx) => {
-  const welcomeMessage = `
+bot.command('start', async (ctx) => {
+  const userId = ctx.from.id;
+  const startPayload = ctx.message.text.split(' ')[1];
+
+  if (startPayload) {
+    const salesmanName = `@${startPayload}`;
+    await handleCommentsRequest(ctx, userId, salesmanName);
+  } else {
+    const welcomeMessage = `
 👋 Привет! Я бот по отзывам продавца.
-Чтобы начать, введи <@имя> или поделись постом с ботом, в котором есть имя продавца.
-  `;
-  ctx.reply(welcomeMessage);
+Чтобы начать, введи <@имя> или поделись постом с ботом
+    `;
+    ctx.reply(welcomeMessage);
+  }
 });
 
 bot.on('message', async (ctx) => {
@@ -151,20 +165,36 @@ bot.on('message', async (ctx) => {
     }
 
     try {
-      await handleCommentsRequest(ctx, userId, salesmanNames[0]);
+      for (const salesmanName of salesmanNames) {
+        const comments = await getComments(salesmanName, 0, 5);
+
+        if (comments.length === 0) {
+          await ctx.reply(`Нет комментариев для продавца ${salesmanName}.`);
+          continue;
+        }
+        await sendComments(ctx, comments);
+      }
     } catch (err) {
       console.error('Error fetching comments:', err);
       ctx.reply('Произошла ошибка при получении комментариев.');
     }
   }
   else if ('text' in message) {
-    const salesmanName = message.text.trim();
+    const text = message.text.trim();
 
-    if (!salesmanName) {
-      return ctx.reply('Пожалуйста, введите корректное имя.');
+    const usernameFromLink = extractUsernameFromLink(text);
+
+    if (usernameFromLink) {
+      await handleCommentsRequest(ctx, userId, usernameFromLink);
+    } else {
+      const salesmanName = text;
+
+      if (!salesmanName) {
+        return ctx.reply('Пожалуйста, введите корректное имя или ссылку.');
+      }
+
+      await handleCommentsRequest(ctx, userId, salesmanName);
     }
-
-    await handleCommentsRequest(ctx, userId, salesmanName);
   }
   else {
     return ctx.reply('Это не текстовое сообщение и не пересланное сообщение.');

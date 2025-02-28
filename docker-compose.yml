@@ -6,7 +6,11 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - mongo_data:/data/db
+      - mongo_data_bot:/data_bot/db/
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB}
 
   server:
     build: .
@@ -32,4 +36,4 @@ services:
     command: ["node", "dist/bot.js"]
 
 volumes:
-  mongo_data:
+  mongo_data_bot:
