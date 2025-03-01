@@ -12,17 +12,17 @@ services:
   #     MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
   #     MONGO_INITDB_DATABASE: ${MONGO_DB}
 
-  # server:
-  #   build: .
-  #   container_name: excel_server
-  #   restart: always
-  #   ports:
-  #     - "${PORT}:${PORT}"
-  #   depends_on:
-  #     - mongo
-  #   environment:
-  #     MONGO_URI: ${MONGO_URI}
-  #     PORT: ${PORT}
+  server:
+    build: .
+    container_name: excel_server
+    restart: always
+    ports:
+      - "${PORT}:${PORT}"
+    # depends_on:
+    #   - mongo
+    environment:
+      MONGO_URI: ${MONGO_URI}
+      PORT: ${PORT}
 
   bot:
     build: .
