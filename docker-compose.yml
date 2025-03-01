@@ -33,7 +33,7 @@ services:
     environment:
       MONGO_URI: ${MONGO_URI}
       API_BOT: ${API_BOT}
-    command: ["npx","ts-node", "bot.ts"]
+    command: ["node", "dist/bot.js"]
 
 # volumes:
 #   mongo_data_bot:
