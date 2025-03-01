@@ -91,9 +91,9 @@ function parserNameOnText(text: string) {
 
         app.listen(PORT, async () => {
             console.log(`Server running on port ${PORT}`);
-            await readExcelAndSaveToDB(excelFilePath1, "@bookshaloba");
-            await readExcelAndSaveToDB(excelFilePath2, "@raspakovkacpek");
-            await readExcelAndSaveToDB(excelFilePath3, "@black_cashbacks2");
+            // await readExcelAndSaveToDB(excelFilePath1, "@bookshaloba");
+            // await readExcelAndSaveToDB(excelFilePath2, "@raspakovkacpek");
+            // await readExcelAndSaveToDB(excelFilePath3, "@black_cashbacks2");
         });
     } catch (err) {
         console.error('Error starting server:', err);
