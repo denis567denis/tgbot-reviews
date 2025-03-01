@@ -5,6 +5,7 @@ import { AnalyticsModel } from './models/AnalyticsModel';
 import { dbConnection } from './db/dbConnection';
 import path from 'path';
 import * as dotenv from 'dotenv';
+import bot from './bot';
 
 dotenv.config();
 
@@ -90,6 +91,16 @@ function parserNameOnText(text: string) {
         await dbConnection.connect();
 
         app.listen(PORT, async () => {
+            (async () => {
+              try {
+                await dbConnection.connect();
+                bot.launch();
+                console.log('Bot is running...');
+              } catch (err) {
+                console.error('Error starting bot:', err);
+                process.exit(1);
+              }
+            })();
             console.log(`Server running on port ${PORT}`);
             // await readExcelAndSaveToDB(excelFilePath1, "@bookshaloba");
             // await readExcelAndSaveToDB(excelFilePath2, "@raspakovkacpek");

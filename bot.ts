@@ -116,17 +116,6 @@ async function handleCommentsRequest(ctx: any, userId: number, salesmanName: str
   }
 }
 
-(async () => {
-  try {
-    await dbConnection.connect();
-    bot.launch();
-    console.log('Bot is running...');
-  } catch (err) {
-    console.error('Error starting bot:', err);
-    process.exit(1);
-  }
-})();
-
 bot.command('start', async (ctx) => {
   const userId = ctx.from.id;
   const startPayload = ctx.message.text.split(' ')[1];
@@ -226,3 +215,5 @@ process.on('SIGTERM', () => {
   bot.stop('SIGTERM');
   console.log('Bot stopped.');
 });
+
+export default bot;
