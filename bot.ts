@@ -134,6 +134,7 @@ bot.command('start', async (ctx) => {
   if (startPayload) {
     const salesmanName = `@${startPayload}`;
     await handleCommentsRequest(ctx, userId, salesmanName);
+    await updateActiveUserOrCreateUser(ctx);
   } else {
     const welcomeMessage = `
 👋 Привет! Я бот по отзывам продавца.

@@ -1,5 +1,8 @@
 FROM node:16 AS builder
 
+ENV API_BOT=${API_BOT}
+ENV MONGO_URI=${MONGO_URI}
+
 WORKDIR /app
 
 COPY package*.json ./
@@ -17,4 +20,4 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/exelData ./exelData
 
-CMD ["node", "dist/server.js"]
+CMD ["node", "dist/bot.js"]

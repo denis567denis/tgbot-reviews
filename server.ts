@@ -11,9 +11,9 @@ dotenv.config();
 const app = express();
 const PORT = Number.parseInt(process.env.PORT!);
 
-const excelFilePath1 = path.resolve(__dirname, '../exelData/exel1.xlsx');
-const excelFilePath2 = path.resolve(__dirname, '../exelData/exel2.xlsx');
-const excelFilePath3 = path.resolve(__dirname, '../exelData/exel3.xlsx');
+const excelFilePath1 = path.resolve(__dirname, './exelData/exel1.xlsx');
+const excelFilePath2 = path.resolve(__dirname, './exelData/exel2.xlsx');
+const excelFilePath3 = path.resolve(__dirname, './exelData/exel3.xlsx');
 
 async function readExcelAndSaveToDB(excelFilePath: string, source: string): Promise<void> {
   try {
