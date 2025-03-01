@@ -28,8 +28,8 @@ services:
     build: .
     container_name: telegram_bot
     restart: always
-    depends_on:
-      - mongo
+    # depends_on:
+    #   - mongo
     environment:
       MONGO_URI: ${MONGO_URI}
       API_BOT: ${API_BOT}
