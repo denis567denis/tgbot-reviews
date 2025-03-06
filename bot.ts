@@ -1,12 +1,16 @@
 import { Telegraf, Markup } from 'telegraf';
-import { dbConnection } from './db/dbConnection';
 import * as dotenv from 'dotenv';
-import { DataModel } from './models/DataModel';
-import { AnalyticsUsersModel } from "./models/AnaliticsUsersModel";
+import { updateDailyStats } from './services/statisticForDay.service';
+import { updateActiveUserOrCreateUser } from './services/analiticsUsers';
+import { getComments, addReview } from './services/data.service';
 
 dotenv.config();
 
 const bot = new Telegraf(process.env.API_BOT!);
+
+// const customKeyboard = Markup.keyboard([
+//   ['О боте', 'Добавить отзыв'],
+// ]).resize();
 
 const userSkipState: { [userId: number]: { skip: number; salesmanName: string } } = {};
 
@@ -30,17 +34,16 @@ function isForwardedMessage(message: any): message is { forward_date: number } {
 
 function getMessageText(message: any): string | undefined {
   if ('text' in message) {
-    return message.text; // Текстовое сообщение
+    return message.text;
   } else if ('caption' in message) {
-    return message.caption; // Медиа с подписью
+    return message.caption;
   }
-  return undefined; // Сообщение не содержит текста или подписи
+  return undefined;
 }
 
-// Функция для извлечения @username из ссылки
 function extractUsernameFromLink(text: string): string | null {
   const match = text.match(/https:\/\/t\.me\/\w+_bot\/(@\w+)/);
-  return match ? match[1] : null; // Возвращаем @username или null
+  return match ? match[1] : null;
 }
 
 async function sendComments(ctx: any, comments: any[]) {
@@ -48,42 +51,6 @@ async function sendComments(ctx: any, comments: any[]) {
     const formattedDate = formatDate(item.createdAt);
     const message = `📅 Дата: ${formattedDate}\n👤 Автор: ${item.nameTg}\n💬 Сообщение: ${item.message}`;
     await ctx.reply(message);
-  }
-}
-
-async function getComments(salesmanName: string, skip: number, limit: number) {
-  return await DataModel.aggregate([
-    {
-      $match: { salesman: salesmanName },
-    },
-    { $sort: { createdAt: -1 } },
-    { $skip: skip },
-    { $limit: limit },
-  ]);
-}
-
-async function updateActiveUserOrCreateUser(ctx: any) {
-  const idTg = ctx.from.id;
-  const firstName = ctx.from.first_name;
-  const lastName = ctx.from.last_name || '';
-  const username = ctx.from.username || '';
-  try {
-    await AnalyticsUsersModel.updateOne(
-      { idTg },
-      {
-        $set: {
-          firstName,
-          lastName,
-          username,
-          idTg,
-          createdAt: new Date(),
-        },
-      },
-      { upsert: true }
-    );
-    console.log(`User ${idTg} updated in the database.`);
-  } catch (err) {
-    console.error('Error updating user data:', err);
   }
 }
 
@@ -123,7 +90,8 @@ bot.command('start', async (ctx) => {
   if (startPayload) {
     const salesmanName = `@${startPayload}`;
     await handleCommentsRequest(ctx, userId, salesmanName);
-    await updateActiveUserOrCreateUser(ctx);
+    await updateActiveUserOrCreateUser(userId, ctx.from.first_name, ctx.from.last_name || '', ctx.from.username || '');
+    await updateDailyStats(userId.toString());
   } else {
     const welcomeMessage = `
 👋 Привет! Я бот по отзывам продавца.
@@ -133,12 +101,62 @@ bot.command('start', async (ctx) => {
   }
 });
 
+bot.hears('О боте', async (ctx) => {
+  const aboutMessage = `
+🤖 *О боте:*
+Этот бот помогает вам находить отзывы о продавцах на платформе.
+Вы можете искать отзывы по <@имя> продавца или пересылать сообщения с упоминанием продавца.
+  `;
+  await ctx.reply(aboutMessage, { parse_mode: 'Markdown'  });
+});
+
+bot.hears('Добавить отзыв', async (ctx) => {
+  const addReviewMessage = `
+✍️ *Добавить отзыв:*
+Чтобы добавить отзыв, пожалуйста, используйте команду /add_review <@имя продавца> <ваш отзыв>.
+Пример: /add_review @example_user Отличный продавец, рекомендую!
+  `;
+  await ctx.reply(addReviewMessage);
+});
+
+bot.command('info', async (ctx) => {
+  const aboutMessage = `
+🤖 *О боте:*
+Этот бот помогает вам находить отзывы о продавцах на платформе.
+Вы можете искать отзывы по <@имя> продавца или пересылать сообщения с упоминанием продавца.
+  `;
+  await ctx.reply(aboutMessage, { parse_mode: 'Markdown'  });
+});
+
+bot.command('add_review', async (ctx) => {
+  const args = ctx.message.text.split(' ').slice(1);
+  if (args.length < 2) {
+    return ctx.reply('Пожалуйста, укажите имя продавца и ваш отзыв.');
+  }
+  const salesmanName = args[0];
+  const reviewText = args.slice(1).join(' ');
+  const userId = ctx.from.id;
+
+  try {
+    if(userId) {
+      await addReview(salesmanName, userId, reviewText, ctx.from.username || ctx.from.first_name);
+      await updateActiveUserOrCreateUser(userId, ctx.from.first_name, ctx.from.last_name || '', ctx.from.username || '');
+      await updateDailyStats(userId.toString());
+      await ctx.reply('Ваш отзыв успешно добавлен!');
+    }
+  } catch (err) {
+    console.error('Error adding review:', err);
+    await ctx.reply('Произошла ошибка при добавлении отзыва.');
+  }
+});
+
 bot.on('message', async (ctx) => {
   const message = ctx.message;
   const userId = ctx.from.id;
 
   if (userId) {
-    await updateActiveUserOrCreateUser(ctx);
+    await updateActiveUserOrCreateUser(userId, ctx.from.first_name, ctx.from.last_name || '', ctx.from.username || '');
+    await updateDailyStats(userId.toString());
   }
 
   if (isForwardedMessage(message)) {
@@ -168,8 +186,7 @@ bot.on('message', async (ctx) => {
       console.error('Error fetching comments:', err);
       ctx.reply('Произошла ошибка при получении комментариев.');
     }
-  }
-  else if ('text' in message) {
+  } else if ('text' in message) {
     const text = message.text.trim();
 
     const usernameFromLink = extractUsernameFromLink(text);
@@ -185,8 +202,7 @@ bot.on('message', async (ctx) => {
 
       await handleCommentsRequest(ctx, userId, salesmanName);
     }
-  }
-  else {
+  } else {
     return ctx.reply('Это не текстовое сообщение и не пересланное сообщение.');
   }
 });
@@ -199,7 +215,8 @@ bot.action('next_5', async (ctx) => {
   }
 
   if (userId) {
-    await updateActiveUserOrCreateUser(ctx);
+    await updateActiveUserOrCreateUser(userId, ctx.from.first_name, ctx.from.last_name || '', ctx.from.username || '');
+    await updateDailyStats(userId.toString());
   }
 
   userSkipState[userId].skip += 5;
