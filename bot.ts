@@ -90,8 +90,8 @@ bot.command('start', async (ctx) => {
   if (startPayload) {
     const salesmanName = `@${startPayload}`;
     await handleCommentsRequest(ctx, userId, salesmanName);
-    await updateActiveUserOrCreateUser(userId, ctx.from.first_name, ctx.from.last_name || '', ctx.from.username || '');
     await updateDailyStats(userId.toString());
+    await updateActiveUserOrCreateUser(userId, ctx.from.first_name, ctx.from.last_name || '', ctx.from.username || '');
   } else {
     try {
       const welcomeMessage = '👋 Привет! Я бот по отзывам продавца.';
@@ -142,8 +142,8 @@ bot.command('add_review', async (ctx) => {
   try {
     if(userId) {
       await addReview(salesmanName, userId, reviewText, ctx.from.username || ctx.from.first_name);
-      await updateActiveUserOrCreateUser(userId, ctx.from.first_name, ctx.from.last_name || '', ctx.from.username || '');
       await updateDailyStats(userId.toString());
+      await updateActiveUserOrCreateUser(userId, ctx.from.first_name, ctx.from.last_name || '', ctx.from.username || '');
       await ctx.reply('Ваш отзыв успешно добавлен!');
     }
   } catch (err) {
@@ -157,8 +157,8 @@ bot.on('message', async (ctx) => {
   const userId = ctx.from.id;
 
   if (userId) {
-    await updateActiveUserOrCreateUser(userId, ctx.from.first_name, ctx.from.last_name || '', ctx.from.username || '');
     await updateDailyStats(userId.toString());
+    await updateActiveUserOrCreateUser(userId, ctx.from.first_name, ctx.from.last_name || '', ctx.from.username || '');
   }
 
   if (isForwardedMessage(message)) {
@@ -217,8 +217,8 @@ bot.action('next_5', async (ctx) => {
   }
 
   if (userId) {
-    await updateActiveUserOrCreateUser(userId, ctx.from.first_name, ctx.from.last_name || '', ctx.from.username || '');
     await updateDailyStats(userId.toString());
+    await updateActiveUserOrCreateUser(userId, ctx.from.first_name, ctx.from.last_name || '', ctx.from.username || '');
   }
 
   userSkipState[userId].skip += 5;
