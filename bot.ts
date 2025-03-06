@@ -93,11 +93,13 @@ bot.command('start', async (ctx) => {
     await updateActiveUserOrCreateUser(userId, ctx.from.first_name, ctx.from.last_name || '', ctx.from.username || '');
     await updateDailyStats(userId.toString());
   } else {
-    const welcomeMessage = `
-👋 Привет! Я бот по отзывам продавца.
-Чтобы начать, введи <@имя> или поделись постом с ботом
-    `;
-    ctx.reply(welcomeMessage);
+    try {
+      const welcomeMessage = '👋 Привет! Я бот по отзывам продавца.';
+      await ctx.reply(welcomeMessage);
+    } catch (error) {
+        console.error('Ошибка при отправке сообщения:', error);
+
+    }
   }
 });
 
