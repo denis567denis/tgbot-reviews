@@ -3,6 +3,7 @@ import * as dotenv from 'dotenv';
 import { updateDailyStats } from './services/statisticForDay.service';
 import { updateActiveUserOrCreateUser } from './services/analiticsUsers';
 import { getComments, addReview } from './services/data.service';
+import { AnalyticsUsersModel } from './models/AnaliticsUsersModel';
 
 dotenv.config();
 
@@ -96,7 +97,10 @@ bot.command('start', async (ctx) => {
     try {
       const welcomeMessage = '👋 Привет! Я бот по отзывам продавца.';
       await ctx.reply(welcomeMessage);
-    } catch (error) {
+    } catch (error: any) {
+      if(error.response && error.response.error_code === 403) {
+        await AnalyticsUsersModel.deleteOne({idTg: `${ctx.from.id}`});
+      }
         console.error('Ошибка при отправке сообщения:', error);
 
     }
