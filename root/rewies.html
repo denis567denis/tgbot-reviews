@@ -24,9 +24,8 @@
             font-size: 22px;
         }
 
-        textarea {
+        input[type="text"], textarea {
             width: 100%;
-            min-height: 140px;
             font-size: 16px;
             padding: 12px;
             border: 1px solid #ccc;
@@ -96,16 +95,23 @@
     <h2>Добавить отзыв</h2>
 
     <form id="reviewForm">
+        <!-- Поле для ввода имени продавца -->
+        <input type="text" id="salesmanName" placeholder="Введите имя продавца (например, @username)" required />
+
+        <!-- Поле для ввода отзыва -->
         <textarea id="reviewText" placeholder="Напишите ваш отзыв здесь..." required></textarea>
 
+        <!-- Кнопки "Лайк" и "Дизлайк" -->
         <div class="feedback-buttons">
             <button type="button" id="dislikeBtn" title="Плохо">👎</button>
             <button type="button" id="likeBtn" title="Хорошо">👍</button>
         </div>
 
+        <!-- Кнопка отправки -->
         <button class="submit-btn" type="submit">Оставить отзыв</button>
     </form>
 
+    <!-- Блок благодарности -->
     <div id="thankYou">
         <h3>Спасибо за отзыв! 🙏</h3>
         <p>Ваш отзыв отправлен на проверку.</p>
@@ -113,14 +119,17 @@
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand();
-        let rating = null;
+        tg.expand(); // Расширяем Mini App на весь экран
 
+        let rating = null; // Оценка пользователя (like или dislike)
+
+        // Получаем элементы DOM
         const likeBtn = document.getElementById('likeBtn');
         const dislikeBtn = document.getElementById('dislikeBtn');
         const form = document.getElementById('reviewForm');
         const thankYouBlock = document.getElementById('thankYou');
 
+        // Обработчики кнопок "Лайк" и "Дизлайк"
         likeBtn.addEventListener('click', () => {
             rating = 'like';
             likeBtn.classList.add('active');
@@ -133,32 +142,43 @@
             likeBtn.classList.remove('active');
         });
 
-        form.addEventListener('submit', async function(e) {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const text = document.getElementById('reviewText').value.trim();
 
-            if (!text) {
-                alert("Пожалуйста, введите отзыв.");
+            const salesmanName = document.getElementById('salesmanName').value.trim();
+            const reviewText = document.getElementById('reviewText').value.trim();
+
+            if (!salesmanName || !reviewText || !rating) {
+                tg.showAlert('Пожалуйста, заполните все поля и выберите оценку.');
                 return;
             }
 
-            fetch('https://your-bot-api-endpoint.com/add-review', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                userId: tg.initDataUnsafe.user.id,
-                userName: tg.initDataUnsafe.user.username,
-                salesmanName,
-                reviewText,
-            }),
-            });
+            try {
+                const response = await fetch(``, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: tg.initDataUnsafe.user.id,
+                        userName: tg.initDataUnsafe.user.username || 'Не указан',
+                        salesmanName,
+                        reviewText,
+                        rating,
+                    }),
+                });
 
-            form.style.display = 'none';
-            thankYouBlock.style.display = 'block';
+                if (!response.ok) {
+                    throw new Error('Ошибка при отправке отзыва.');
+                }
 
-            setTimeout(() => {
-                tg.close();
-            }, 2000);
+                form.style.display = 'none';
+                thankYouBlock.style.display = 'block';
+
+                setTimeout(() => {
+                    tg.close();
+                }, 2000);
+            } catch (error) {
+                tg.showAlert(`Произошла ошибка: ${error.message}`);
+            }
         });
     </script>
 </body>
