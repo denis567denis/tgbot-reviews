@@ -6,7 +6,7 @@ import { analyzePosts } from '../server';
 const router = express.Router();
 
 router.get('/',(req: Request, res: Response)=> {
-    res.sendFile(path.join(__dirname, 'rewies.html'));
+    res.sendFile(path.join(__dirname, '../root/rewies.html'));
 });
 
 router.post('/sendRewie',async (req: Request, res: Response) => {
