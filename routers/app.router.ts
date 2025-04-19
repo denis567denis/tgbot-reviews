@@ -4,7 +4,6 @@ import multer from 'multer';
 import { DataModel } from '../models/DataModel';
 import { AnalyticsModel } from '../models/AnalyticsModel';
 import XLSX from 'xlsx';
-import indexFile from '../root/'
 
 const router = express.Router();
 const upload = multer({ dest: 'uploads/' });
