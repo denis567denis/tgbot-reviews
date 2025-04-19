@@ -9,10 +9,6 @@ dotenv.config();
 
 const bot = new Telegraf(process.env.API_BOT!);
 
-// const customKeyboard = Markup.keyboard([
-//   ['О боте', 'Добавить отзыв'],
-// ]).resize();
-
 const userSkipState: { [userId: number]: { skip: number; salesmanName: string } } = {};
 
 function formatDate(date: Date): string {
@@ -96,7 +92,11 @@ bot.command('start', async (ctx) => {
   } else {
     try {
       const welcomeMessage = '👋 Привет! Я бот по отзывам продавца.';
-      await ctx.reply(welcomeMessage);
+      await ctx.reply(welcomeMessage, {
+        reply_markup: Markup.keyboard([
+          Markup.button.webApp('Добавить отзыв',`${process.env.HOST}:${process.env.PORT}/reviews`),
+        ]).reply_markup
+      });
     } catch (error: any) {
       if(error.response && error.response.error_code === 403) {
         await AnalyticsUsersModel.deleteOne({idTg: `${ctx.from.id}`});

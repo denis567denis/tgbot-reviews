@@ -1,39 +1,39 @@
 services:
-  # mongo:
-  #   image: mongo:6.0
-  #   container_name: mongo_container
-  #   restart: always
-  #   ports:
-  #     - "27017:27017"
-  #   volumes:
-  #     - mongo_data_bot:/data_bot/db/
-  #   environment:
-  #     MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
-  #     MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
-  #     MONGO_INITDB_DATABASE: ${MONGO_DB}
-
-  server:
-    build: .
-    container_name: excel_server
+  mongo:
+    image: mongo:6.0
+    container_name: mongo_container
     restart: always
     ports:
-      - "${PORT}:${PORT}"
-    # depends_on:
-    #   - mongo
+      - "27017:27017"
+    volumes:
+      - mongo_data_bot:/data_bot/db/
     environment:
-      MONGO_URI: ${MONGO_URI}
-      PORT: ${PORT}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB}
 
-  bot:
-    build: .
-    container_name: telegram_bot
-    restart: always
-    # depends_on:
-    #   - mongo
-    environment:
-      MONGO_URI: ${MONGO_URI}
-      API_BOT: ${API_BOT}
-    command: ["node", "dist/bot.js"]
+  # server:
+  #   build: .
+  #   container_name: excel_server
+  #   restart: always
+  #   ports:
+  #     - "${PORT}:${PORT}"
+  #   # depends_on:
+  #   #   - mongo
+  #   environment:
+  #     MONGO_URI: ${MONGO_URI}
+  #     PORT: ${PORT}
 
-# volumes:
-#   mongo_data_bot:
+  # bot:
+  #   build: .
+  #   container_name: telegram_bot
+  #   restart: always
+  #   # depends_on:
+  #   #   - mongo
+  #   environment:
+  #     MONGO_URI: ${MONGO_URI}
+  #     API_BOT: ${API_BOT}
+  #   command: ["node", "dist/bot.js"]
+
+volumes:
+  mongo_data_bot:

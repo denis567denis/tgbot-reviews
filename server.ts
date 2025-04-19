@@ -1,4 +1,4 @@
-import express from 'express';
+import express, {Request, Response} from 'express';
 import XLSX from 'xlsx';
 import { DataModel } from './models/DataModel';
 import { AnalyticsModel } from './models/AnalyticsModel';
@@ -6,6 +6,7 @@ import { dbConnection } from './db/dbConnection';
 import path from 'path';
 import * as dotenv from 'dotenv';
 import bot from './bot';
+import routerApp from './routers/app.router';
 
 dotenv.config();
 
@@ -64,7 +65,7 @@ async function readExcelAndSaveToDB(excelFilePath: string, source: string): Prom
   }
 }
 
-async function analyzePosts(salesman: string[]) {
+export async function analyzePosts(salesman: string[]) {
     const updates = salesman.map((salesElement) => ({
         updateOne: {
             filter: { authorName: salesElement },
@@ -86,6 +87,7 @@ function parserNameOnText(text: string) {
     }
 }
 
+app.use('/reviews', routerApp);
 (async () => {
     try {
         await dbConnection.connect();
