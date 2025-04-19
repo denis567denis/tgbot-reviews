@@ -4,12 +4,13 @@ import multer from 'multer';
 import { DataModel } from '../models/DataModel';
 import { AnalyticsModel } from '../models/AnalyticsModel';
 import XLSX from 'xlsx';
+import indexFile from '../root/'
 
 const router = express.Router();
 const upload = multer({ dest: 'uploads/' });
 
 router.get('/',(req: Request, res: Response)=> {
-    res.sendFile(path.join(__dirname, '../root/rewies.html'));
+    res.sendFile(path.join(__dirname, '../../root/rewies.html'));
 });
 
 router.post('/sendRewie',async (req: Request, res: Response) => {
