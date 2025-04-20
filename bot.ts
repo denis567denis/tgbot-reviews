@@ -99,7 +99,7 @@ bot.command('start', async (ctx) => {
       const welcomeMessage = '👋 Привет! Я бот по отзывам продавца.';
       await ctx.reply(welcomeMessage, {
         reply_markup: Markup.keyboard([
-          Markup.button.webApp('Добавить отзыв',`${process.env.HOST}/reviews/`),
+          Markup.button.webApp('✍️ Добавить отзыв',`${process.env.HOST}/reviews/`),
         ]).reply_markup
       });
     } catch (error: any) {
