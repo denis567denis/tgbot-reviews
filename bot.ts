@@ -65,7 +65,7 @@ async function handleCommentsRequest(ctx: any, userId: number, salesmanName: str
 
     const keybord2 = Markup.keyboard([
       Markup.button.webApp('✍️ Добавить отзыв',`${process.env.HOST}/reviews/`),
-    ]);
+    ]).resize();
 
     if (comments.length === 0) {
       return ctx.reply('Нет комментариев по этому человеку. Можете добавить свой отзыв выбрав кнопку',keybord2);
@@ -97,11 +97,10 @@ bot.command('start', async (ctx) => {
   } else {
     try {
       const welcomeMessage = '👋 Привет! Я бот по отзывам продавца.';
-      await ctx.reply(welcomeMessage, {
-        reply_markup: Markup.keyboard([
+      await ctx.reply(welcomeMessage,  Markup.keyboard([
           Markup.button.webApp('✍️ Добавить отзыв',`${process.env.HOST}/reviews/`),
-        ]).reply_markup
-      });
+        ]).resize()
+      );
     } catch (error: any) {
       if(error.response && error.response.error_code === 403) {
         await AnalyticsUsersModel.deleteOne({idTg: `${ctx.from.id}`});
