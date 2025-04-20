@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Добавить отзыв</title>
-    <script src="https://telegram.org/js/telegram-web-app.js?57"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <style>
         * {
@@ -118,6 +118,7 @@
     </div>
 
     <script>
+        try{
         const tg = window.Telegram.WebApp;
         tg.expand();
 
@@ -153,7 +154,6 @@
                 return;
             }
 
-            //https://denis567denis-tgbot-reviews-5744.twc1.net/reviews/sendRewie
             try {
                  fetch(`https://denis567denis-tgbot-reviews-5744.twc1.net/reviews/sendRewie`, {
                     method: 'POST',
@@ -176,6 +176,10 @@
                 tg.showAlert(`Произошла ошибка: ${error.message}`);
             }
         });
+        }
+        catch(err) {
+            tg.showAlert(`Произошла ошибка: ${error.message}`);
+        }
     </script>
 </body>
 </html>
