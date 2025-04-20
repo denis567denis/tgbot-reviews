@@ -145,8 +145,6 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            console.log("denis",  tg);
-            console.log("denois", tg.initDataUnsafe.user);
             const salesmanName = document.getElementById('salesmanName').value.trim();
             const reviewText = document.getElementById('reviewText').value.trim();
 
@@ -157,7 +155,7 @@
 
             //https://denis567denis-tgbot-reviews-5744.twc1.net/reviews/sendRewie
             try {
-                const response = await fetch(`https://denis567denis-tgbot-reviews-5744.twc1.net/reviews/sendRewie`, {
+                 fetch(`https://denis567denis-tgbot-reviews-5744.twc1.net/reviews/sendRewie`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
