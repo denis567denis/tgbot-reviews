@@ -13,6 +13,7 @@ router.get('/',(req: Request, res: Response)=> {
 });
 
 router.post('/sendRewie',async (req: Request, res: Response) => {
+  try{
     const {userId, userName, salesmanName, reviewText } = req.body;
 
     if(userId && salesmanName && reviewText) {
@@ -26,6 +27,11 @@ router.post('/sendRewie',async (req: Request, res: Response) => {
         createdAt: new Date(),
     });
     }
+    return;
+  }catch(err: any) {
+    console.log(err);
+    return;
+  }
 })
 
 router.post('/upload-excel', upload.single('file'), async (req: Request, res: Response) => {
