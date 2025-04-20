@@ -63,12 +63,8 @@ async function handleCommentsRequest(ctx: any, userId: number, salesmanName: str
 
     const comments = await getComments(salesmanName, userSkipState[userId].skip, 5);
 
-    const keybord2 = Markup.keyboard([
-      Markup.button.webApp('✍️ Добавить отзыв',`${process.env.HOST}/reviews/`),
-    ]).resize();
-
     if (comments.length === 0) {
-      return ctx.reply('Нет комментариев по этому человеку. Можете добавить свой отзыв выбрав кнопку',keybord2);
+      return ctx.reply('Нет комментариев по этому человеку. Можете добавить свой отзыв выбрав кнопку');
     }
 
     await sendComments(ctx, comments);
@@ -78,12 +74,23 @@ async function handleCommentsRequest(ctx: any, userId: number, salesmanName: str
     ]);
 
     await ctx.reply('Хотите увидеть больше комментариев?', keyboard);
-    await ctx.reply('✍️ Или можете добавить свой отзыв по продовцу', keybord2);
   } catch (err) {
     console.error('Error fetching comments:', err);
     ctx.reply('Произошла ошибка при получении комментариев.');
   }
 }
+
+// const keybord2 = Markup.keyboard([
+//   Markup.button.webApp('✍️ Добавить отзыв',`${process.env.HOST}/reviews/`),
+// ]).resize();
+
+bot.command('addrewiev',async (ctx) => {
+  ctx.reply('✍️ Оставте отзыв о продовце:', {
+    reply_markup: Markup.inlineKeyboard([
+      Markup.button.webApp('Оставить отзыв', `${process.env.HOST}/reviews/`),
+    ]).reply_markup,
+  });
+})
 
 bot.command('start', async (ctx) => {
   const userId = ctx.from.id;
@@ -97,10 +104,7 @@ bot.command('start', async (ctx) => {
   } else {
     try {
       const welcomeMessage = '👋 Привет! Я бот по отзывам продавца.';
-      await ctx.reply(welcomeMessage,  Markup.keyboard([
-          Markup.button.webApp('✍️ Добавить отзыв',`${process.env.HOST}/reviews/`),
-        ]).resize()
-      );
+      await ctx.reply(welcomeMessage);
     } catch (error: any) {
       if(error.response && error.response.error_code === 403) {
         await AnalyticsUsersModel.deleteOne({idTg: `${ctx.from.id}`});

@@ -120,7 +120,7 @@
     <script>
         try{
         const tg = window.Telegram.WebApp;
-        tg.expand();
+        tg.ready();
 
         let rating = null;
 
@@ -176,6 +176,8 @@
                 tg.showAlert(`Произошла ошибка: ${error.message}`);
             }
         });
+
+        tg.expand();
         }
         catch(err) {
             tg.showAlert(`Произошла ошибка: ${error.message}`);
