@@ -160,12 +160,12 @@
                 const response = await fetch(`https://denis567denis-tgbot-reviews-5744.twc1.net/reviews/sendRewie`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: {
+                    body: JSON.stringify({
                         userId: tg.initDataUnsafe.user.id,
                         userName: tg.initDataUnsafe.user.username || 'Не указан',
                         salesmanName,
                         reviewText,
-                    },
+                    }),
                 });
 
                 if (!response.ok) {
