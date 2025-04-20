@@ -64,8 +64,8 @@ async function handleCommentsRequest(ctx: any, userId: number, salesmanName: str
     const comments = await getComments(salesmanName, userSkipState[userId].skip, 5);
 
     const keybord2 = Markup.keyboard([
-      Markup.button.webApp('Добавить отзыв',`${process.env.HOST}/reviews/`),
-    ]).resize();
+      Markup.button.webApp('✍️ Добавить отзыв',`${process.env.HOST}/reviews/`),
+    ]);
 
     if (comments.length === 0) {
       return ctx.reply('Нет комментариев по этому человеку. Можете добавить свой отзыв выбрав кнопку',keybord2);
@@ -78,7 +78,7 @@ async function handleCommentsRequest(ctx: any, userId: number, salesmanName: str
     ]);
 
     await ctx.reply('Хотите увидеть больше комментариев?', keyboard);
-    await ctx.reply('Или можете добавить свой отзыв по продовцу', keybord2);
+    await ctx.reply('✍️ Или можете добавить свой отзыв по продовцу', keybord2);
   } catch (err) {
     console.error('Error fetching comments:', err);
     ctx.reply('Произошла ошибка при получении комментариев.');
